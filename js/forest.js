@@ -5,34 +5,51 @@ $(window).on('load', function() {
 });
 
 $(function() {
-  var ghost, line, mashroom_all, mashroom_num, tsubo;
-  ghost = new Audio("./audio/ghost_1.mp3");
-  line = new Audio("./audio/line_1.mp3");
-  tsubo = new Audio("./audio/tsubo_3.mp3");
-  ghost.load();
-  ghost.addEventListener("ended", function(e) {
-    e.target.pause();
-    return e.target.currentTime = 0;
+  var mashroom_all, mashroom_num;
+  $.ionSound({
+    sounds: [
+      {
+        name: "ghost_1",
+        volume: 0.3
+      }, {
+        name: "line_1",
+        volume: 0.3
+      }, {
+        name: "tsubo_3",
+        volume: 0.3
+      }
+    ],
+    path: "audio/",
+    multiPlay: true,
+    volume: 0.3
   });
   mashroom_num = 0;
   mashroom_all = 0;
   return $(window).scroll(function() {
-    var INITIAL_SCALE, margin_bottom, margin_left, mash_width, scale, scrollTop;
+    var INITIAL_SCALE, SCALE_TRANS_END, margin_bottom, margin_left, mash_width, scale, scrollTop, sound, src;
     scrollTop = $(this).scrollTop();
     INITIAL_SCALE = 300;
-    scale = Math.max(100, INITIAL_SCALE - scrollTop / 3000 * (INITIAL_SCALE - 100));
+    SCALE_TRANS_END = 10000;
+    scale = Math.max(100, INITIAL_SCALE - scrollTop / SCALE_TRANS_END * (INITIAL_SCALE - 100));
     $('#field').css('background-size', scale + '% auto');
-    margin_left = 100 * Math.random();
-    margin_bottom = 60 - 60 * Math.cos(Math.random() * Math.PI / 4);
-    mash_width = 20 + 20 * Math.random();
-    if (Math.random() < 0.05) {
-      mash_width = 150;
-    }
-    if (Math.random() < 0.001) {
-      mash_width = 500;
-    }
     if (scrollTop * Math.random() > 1000) {
-      $("<img>").addClass("mashroom").attr('src', "img/mashroom" + (Math.floor(Math.random() * 8)) + ".png").css({
+      $('#mashroom_num').text(++mashroom_num);
+      $('#mashroom_all').text(++mashroom_all);
+      src = "img/mashroom" + (Math.floor(Math.random() * 8)) + ".png";
+      sound = 'ghost_1';
+      margin_left = 100 * Math.random();
+      margin_bottom = 60 - 60 * Math.cos(Math.random() * Math.PI / 4);
+      mash_width = 20 + 20 * Math.random();
+      if (Math.random() < 0.05) {
+        mash_width = 150;
+      }
+      if (Math.random() < 0.001) {
+        src = 'img/agaricus.png';
+        mash_width = 500;
+        sound = 'tsubo_3';
+      }
+      $.ionSound.play(sound);
+      return $("<img>").addClass("mashroom").attr('src', src).css({
         width: "0px",
         height: "auto",
         position: "fixed",
@@ -49,12 +66,9 @@ $(function() {
         }, 1000, "easeInOutBack", function() {
           $(this).remove();
           $('#mashroom_num').text(--mashroom_num);
-          return line.play();
+          return $.ionSound.play('line_1');
         });
       }).appendTo(field);
-      $('#mashroom_num').text(++mashroom_num);
-      $('#mashroom_all').text(++mashroom_all);
-      return ghost.play();
     }
   });
 });
